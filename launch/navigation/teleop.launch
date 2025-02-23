@@ -1,0 +1,18 @@
+<launch>
+  <arg name="teleop_input" default="joystick" />
+
+  <group if="$(eval arg('teleop_input') == 'joystick')">
+    <node pkg="joy" type="joy_node" name="joy_node">
+      <param name="dev" value="/dev/input/js0" />
+      <param name="deadzone" value="0.3" />
+      <param name="autorepeat_rate" value="20" />
+    </node>
+    <node pkg="teleop_twist_joy" name="teleop_twist_joy" type="teleop_node">
+      <rosparam command="load" file="$(find me5413_bringup)/config/xbox.yaml" />
+    </node>
+  </group>
+
+  <group if="$(eval arg('teleop_input') == 'keyboard')">
+      <node name="teleop_twist_keyboard" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py"/>
+  </group>
+</launch>

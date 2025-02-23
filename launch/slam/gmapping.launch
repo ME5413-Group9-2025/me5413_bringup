@@ -1,0 +1,12 @@
+<launch>
+  <arg name="base_frame" default="base_link" />
+  <arg name="odom_frame" default="odom" />
+
+  <!-- Launch Gmapping -->
+  <param name="use_sim_time" value="true"/>
+  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen" clear_params="true">
+      <param name="base_frame" value="$(arg base_frame)"/>
+      <param name="odom_frame" value="$(arg odom_frame)"/>
+      <rosparam command="load" file="$(find me5413_bringup)/config/gmapping.yaml" />
+  </node>
+</launch>
