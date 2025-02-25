@@ -69,7 +69,7 @@ rm -rf .git # After this step, any updates from TA will conduct by yourself manu
 # Clone the necessary repository
 cd src
 git clone https://github.com/ME5413-Group9-2025/navigation
-git clone https://github.com/ME5413-Group9-2025/robot_localization.git
+git clone https://github.com/ME5413-Group9-2025/robot_localization.git --branch noetic-devel
 git clone https://github.com/ME5413-Group9-2025/teb_local_planner.git
 # clone any other code in our github team
 
