@@ -8,10 +8,6 @@
   <arg name="initial_pose_y" default="1.5"/>
   <arg name="initial_pose_a" default="0"/>
 
-  <!-- Map Server-->
-  <arg name="map_file" default="$(find me5413_bringup)/maps/map.yaml"/>
-  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
-
   <!-- AMCL -->
   <node pkg="amcl" type="amcl" name="amcl">
     <param name="min_particles"             value="500"/>

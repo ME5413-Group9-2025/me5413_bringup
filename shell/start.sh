@@ -3,9 +3,9 @@ export GAZEBO_MODEL_PATH="$(HOME)/models"
 export JACKAL_LASER=1
 export JACKAL_LASER_TOPIC="scan"
 export JACKAL_LASER_MODEL="ust10"
-export JACKAL_LASER_3D=0
-#export JACKAL_LASER_3D_MODEL="vlp16"
-#export JACKAL_LASER_3D_TOPIC="velodyne_points"
+export JACKAL_LASER_3D=1
+export JACKAL_LASER_3D_MODEL="vlp16"
+export JACKAL_LASER_3D_TOPIC="velodyne"
 #export JACKAL_BB2=1
 
 cd $HOME/ME5413_Final_Project
