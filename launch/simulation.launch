@@ -6,6 +6,10 @@
   <arg name="config"        default="base" />
   <arg name="teleop_input"  default="joystick" />
 
+  <arg name="spawn_x" default="0" />
+  <arg name="spawn_y" default="0" />
+  <arg name="spawn_Y" default="1.57079632679" />
+
 
   <!-- Launch Gazebo with the specified world -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">

@@ -8,8 +8,11 @@ export JACKAL_LASER_3D_MODEL="vlp16"
 export JACKAL_LASER_3D_TOPIC="velodyne"
 #export JACKAL_BB2=1
 
+
 cd $HOME/ME5413_Final_Project
 
 source devel/setup.bash
 
-roslaunch me5413_bringup simulation.launch
+roslaunch me5413_bringup simulation.launch spawn_x:=$X_POS spawn_y:=$Y_POS spawn_Y:=$YAW
+
+
