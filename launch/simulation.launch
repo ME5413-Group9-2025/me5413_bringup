@@ -28,7 +28,7 @@
 
 <!--   Spawn Jackal -->
   <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
-	      args="-urdf -model jackal -param robot_description -x 0 -y 0 -z 3.0 -R 0 -P 0 -Y 1.57079632679" />
+	      args="-urdf -model jackal -param robot_description -x $(arg spawn_x) -y $(arg spawn_y) -z 3.0 -R 0 -P 0 -Y $(arg spawn_Y)" />
 
 <!--   Load the destination configuration -->
   <rosparam command="load" file="$(find me5413_world)/config/config.yaml" />
