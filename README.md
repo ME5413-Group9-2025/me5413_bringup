@@ -71,17 +71,18 @@ cd src
 git clone https://github.com/ME5413-Group9-2025/navigation
 git clone https://github.com/ME5413-Group9-2025/robot_localization.git --branch noetic-devel
 git clone https://github.com/ME5413-Group9-2025/teb_local_planner.git
-# clone any other code in our github team
+# clone any other code in our github team and cartographer
 
 # Install all dependencies
 cd ..
 rosdep install --from-paths src --ignore-src -r -y
 
-# Build 
-catkin_make
+# Build
+rm -rf build build_isolated install install_isolated devel devel_isolated
+catkin_make_isolated
 
 # Source 
-source devel/setup.bash
+source devel_isolated/setup.bash
 ```
 
 To properly load the gazebo world, you will need to have the necessary model files in the `~/.gazebo/models/` directory.
