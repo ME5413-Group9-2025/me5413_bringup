@@ -60,6 +60,7 @@ TRAJECTORY_BUILDER_2D.submaps.grid_options_2d.resolution = 0.05
 TRAJECTORY_BUILDER_2D.min_range = 0.3
 TRAJECTORY_BUILDER_2D.max_range = 100.
 TRAJECTORY_BUILDER_2D.min_z = 0.3
+TRAJECTORY_BUILDER_2D.missing_data_ray_length = 30.
 
 -- Motion Filter
 TRAJECTORY_BUILDER_2D.motion_filter.max_distance_meters = 0.2
