@@ -13,6 +13,9 @@ export JACKAL_LASER_3D=1
 export JACKAL_LASER_3D_MODEL="vlp16"
 export JACKAL_LASER_3D_TOPIC="velodyne"
 #export JACKAL_BB2=1
+export JACKAL_FLEA3=0
+export JACKAL_STEREO_FLEA3=1
+export JACKAL_FLEA3_TILT="0"
 
 
 cd $HOME/ME5413_Final_Project
