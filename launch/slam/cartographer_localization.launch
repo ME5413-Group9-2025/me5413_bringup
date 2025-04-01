@@ -6,7 +6,7 @@
           -configuration_basename cartographer_mapping.lua
           -load_state_filename $(find me5413_bringup)/maps/mymap.pbstream"
       output="screen">
-        <remap from="/odom" to="/odometry/filtered" />
+        <remap from="/odom" to="/jackal_velocity_controller/odom" />
         <remap from="/points2" to="/velodyne" />
         <remap from="/scan" to="/scan" />
         <remap from="/imu" to="/imu/data"/>

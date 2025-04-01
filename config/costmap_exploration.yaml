@@ -10,7 +10,5 @@ explore_costmap:
     plugins:
         - {name: external, type: "costmap_2d::StaticLayer"}
         - {name: explore_boundary, type: "frontier_exploration::BoundedExploreLayer"}
-        - {name: obstacles_laser, type: "costmap_2d::ObstacleLayer"}
+#        - {name: obstacles_laser, type: "costmap_2d::ObstacleLayer"}
         - {name: inflation, type: "costmap_2d::InflationLayer"}
-
-
