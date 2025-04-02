@@ -27,7 +27,7 @@
  <include file="$(find jackal_control)/launch/control.launch">
     <arg name="enable_ekf" value="false"/>
  </include>
- <param name="/jackal_velocity_controller/enable_odom_tf" value="true" />
+<!--  <param name="/jackal_velocity_controller/enable_odom_tf" value="true" /> -->
 
 <!--   Spawn Jackal -->
   <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
