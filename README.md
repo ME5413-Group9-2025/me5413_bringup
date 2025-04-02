@@ -71,6 +71,10 @@ cd src
 git clone https://github.com/ME5413-Group9-2025/navigation
 git clone https://github.com/ME5413-Group9-2025/robot_localization.git --branch noetic-devel
 git clone https://github.com/ME5413-Group9-2025/teb_local_planner.git
+git clone https://github.com/ME5413-Group9-2025/explore_lite.git
+git clone https://github.com/ME5413-Group9-2025/me5413_bringup.git
+git clone https://github.com/ME5413-Group9-2025/me5413_perception.git
+
 # clone any other code in our github team and cartographer
 
 # Install all dependencies
@@ -80,6 +84,8 @@ rosdep install --from-paths src --ignore-src -r -y
 # Build
 rm -rf build build_isolated install install_isolated devel devel_isolated
 catkin_make_isolated
+# only make specified package
+catkin_make_isolated --pkg <pkg_name> --use-ninja
 
 # Source 
 source devel_isolated/setup.bash

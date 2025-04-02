@@ -23,7 +23,7 @@ options = {
   published_frame = "base_link",
   odom_frame = "odom",
   provide_odom_frame = true,
-  publish_frame_projected_to_2d = false,
+  publish_frame_projected_to_2d = true,
   use_pose_extrapolator = true,
   use_odometry = true,
   use_nav_sat = false,
@@ -50,7 +50,7 @@ MAP_BUILDER.use_trajectory_builder_2d = true
 --
 
 -- Generate a new submap after getting 300 scans. more scans mean more stableable and more computation
-TRAJECTORY_BUILDER_2D.submaps.num_range_data = 200
+TRAJECTORY_BUILDER_2D.submaps.num_range_data = 100
 TRAJECTORY_BUILDER_2D.num_accumulated_range_data = 1
 
 -- Resolution of submap
@@ -70,14 +70,14 @@ TRAJECTORY_BUILDER_2D.motion_filter.max_angle_radians = math.rad(1.)
 TRAJECTORY_BUILDER_2D.ceres_scan_matcher.occupied_space_weight = 5.
 TRAJECTORY_BUILDER_2D.ceres_scan_matcher.translation_weight = 10.
 TRAJECTORY_BUILDER_2D.ceres_scan_matcher.rotation_weight = 1
-TRAJECTORY_BUILDER_2D.ceres_scan_matcher.ceres_solver_options.max_num_iterations = 80
-TRAJECTORY_BUILDER_2D.ceres_scan_matcher.ceres_solver_options.num_threads = 10
+TRAJECTORY_BUILDER_2D.ceres_scan_matcher.ceres_solver_options.max_num_iterations = 20
+TRAJECTORY_BUILDER_2D.ceres_scan_matcher.ceres_solver_options.num_threads = 2
 
 -- Config for correlative scan matching
 TRAJECTORY_BUILDER_2D.use_online_correlative_scan_matching = true
-TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.linear_search_window = 0.2
+TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.linear_search_window = 0.1
 TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.angular_search_window = math.rad(10.)
-TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.translation_delta_cost_weight = 10
+TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.translation_delta_cost_weight = 1e-1
 TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.rotation_delta_cost_weight = 1e-1
 
 --
