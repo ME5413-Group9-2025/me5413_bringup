@@ -158,7 +158,7 @@ Then, in the second terminal:
 
 ```bash
 # Load a map, launch AMCL localizer, start navigation
-roslaunch me5413_bringup bringup.launch
+roslaunch me5413_bringup bringup.launch slam_method:=cartographer
 ```
 
 ![rviz_navigation_image](media/rviz_navigation.png)
