@@ -8,8 +8,8 @@
     <rosparam file="$(find me5413_bringup)/config/local_costmap_params.yaml" command="load" />
     <rosparam file="$(find me5413_bringup)/config/move_base_params.yaml" command="load" />
 
-<!--     <param name="base_global_planner" value="global_planner/GlobalPlanner" /> -->
-    <param name="base_global_planner" value="my_bezier_global_planner/MyBezierGlobalPlanner" />
+    <param name="base_global_planner" value="global_planner/GlobalPlanner" />
+<!--     <param name="base_global_planner" value="my_bezier_global_planner/MyBezierGlobalPlanner" /> -->
     <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
     <rosparam file="$(find me5413_bringup)/config/teb_config.yaml" command="load" />
 
