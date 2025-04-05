@@ -137,7 +137,7 @@ After launching **Step 0**, in the second terminal:
 
 ```bash
 # Launch GMapping, No only support GMapping, Google Catographer on the way
-roslaunch me5413_bringup mapping.launch
+roslaunch me5413_bringup bringup.launch
 ```
 
 After finishing mapping, run the following command in the thrid terminal to save the map:
