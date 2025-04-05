@@ -11,3 +11,6 @@ oscillation_distance: 0.5
 
 recovery_behavior_enabled: true
 clearing_rotation_allowed: true
+
+#GlobalPlanner:
+#  use_dijkstra: false

@@ -64,6 +64,10 @@
   <depend>teleop_twist_joy</depend>
   <depend>velodyne_simulator</depend>
 
+  <build_depend>message_generation</build_depend>
+  <exec_depend>message_runtime</exec_depend>
+
+
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->

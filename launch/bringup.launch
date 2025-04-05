@@ -4,10 +4,6 @@
   <arg name="slam_method"           default="gmapping" />
   <arg name="enable_exploration"    default="false" />
 
-  <!-- <rosparam param="trajectory_builder_2d.submaps.num_range_data">90</rosparam> -->
-  <!-- <rosparam param="costmap_clearing/clearing">false</rosparam> -->
-  <!-- <rosparam param="pose_graph.constraint_builder.min_score">0.55</rosparam> -->
-
   <group if="$(eval arg('slam_method') == 'gmapping')">
     <include file="$(find me5413_bringup)/launch/slam/gmapping.launch">
         <arg name="base_frame" value="$(arg base_frame)"/>
@@ -24,6 +20,11 @@
   </group>
 
   <include file="$(find me5413_bringup)/launch/navigation/move_base.launch" />
-  <node name="schedule" pkg="me5413_bringup" type="schedule.py" output="screen"/>
+
+  <node name="schedule" pkg="me5413_bringup" type="schedule.py" output="screen">
+      <rosparam file="$(find me5413_bringup)/config/schedule/waypoints.yaml" command="load" />
+  </node>
+
+  <node name="bridge_detector" pkg="me5413_perception" type="bridge_detector_node.py" />
 
 </launch>
