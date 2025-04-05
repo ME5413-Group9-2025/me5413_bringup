@@ -2,7 +2,7 @@
 
 NUS ME5413 Autonomous Mobile Robotics Final Project
 
-> Authors: Group9, [Liu Xiao](https://github.com/llliuxiao), [Ren Teng](https://github.com/1425T), [Liu Chen-an](https://github.com/songs-for-you), [Hao Yuzhi](https://github.com/carveshadow), [YokeLilee](https://github.com/YokeLiLee) and [Levi](https://github.com/RicardoCDUT)  
+> Authors: Group9, [Liu Xiao](https://github.com/llliuxiao), [Ren Teng](https://github.com/1425T), [Liu Chen-an](https://github.com/songs-for-you), [Hao Yuzhi](https://github.com/carveshadow), [Li Shuo](https://github.com/YokeLiLee) and [Levi](https://github.com/RicardoCDUT)  
 
 ![Ubuntu 20.04](https://img.shields.io/badge/OS-Ubuntu_20.04-informational?style=flat&logo=ubuntu&logoColor=white&color=2bbc8a)
 ![ROS Noetic](https://img.shields.io/badge/Tools-ROS_Noetic-informational?style=flat&logo=ROS&logoColor=white&color=2bbc8a)
