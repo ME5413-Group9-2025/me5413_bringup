@@ -9,6 +9,8 @@ from std_srvs.srv import SetBool, Empty
 from tf.transformations import quaternion_from_euler
 import math
 import random
+from Map_pro import MapProcessor
+from actionlib_msgs.msg import GoalStatus
 
 bridge_length = 5
 
@@ -36,10 +38,10 @@ exp_points = [
 ]
 
 def random_point_on_circle(x, y, radius):
-    # 生成一个随机角度（单位是弧度）
+
     angle = random.uniform(0, 2 * math.pi)
-    
-    # 计算圆周上的新点坐标
+
+
     random_x = x + radius * math.cos(angle)
     random_y = y + radius * math.sin(angle)
     
@@ -49,7 +51,7 @@ def bound_adj(x, y):
     if y < -22.5:
         y = 22.5
     if y > -2.5:
-        y = 2.5
+        y = -2.5
     if x > 19:
         x = 19
     if x < 9:
@@ -83,6 +85,25 @@ class Scheduler:
 
         print("explore schedule")
 
+    def sample_sch(self):
+        map_processor = MapProcessor()
+        cols = 6
+        # dont change rows
+        rows = 4
+        processing_order = map_processor.generate_order(cols, rows)
+        print(processing_order)
+        yaw = math.pi / 2
+        for block_num in processing_order:
+            x, y = map_processor.process_a_block(block_num, cols, rows)
+            if x == None and y == None:
+                continue
+            if block_num > 2*cols:
+                yaw = (-1) * math.pi / 2
+            self.publish_navigation_goal(x, y, yaw)
+            self.clear_costmap_client()
+            rospy.sleep(2.)
+        print("Sample schedule")
+
     def enable_exploration_and_perception(self):
         self.enable_perception_client(True)
 
@@ -100,34 +121,46 @@ class Scheduler:
         self.publish_navigation_goal(x, y - bridge_length, yaw)
 
     def publish_navigation_goal(self, x, y, yaw):
-        move_base_goal = MoveBaseGoal()
-        move_base_goal.target_pose.header.frame_id = "map"
-        move_base_goal.target_pose.header.stamp = rospy.Time.now()
-        move_base_goal.target_pose.pose.position.x = x
-        move_base_goal.target_pose.pose.position.y = y
-        quat = quaternion_from_euler(0, 0, yaw)
-        move_base_goal.target_pose.pose.orientation.x = quat[0]
-        move_base_goal.target_pose.pose.orientation.y = quat[1]
-        move_base_goal.target_pose.pose.orientation.z = quat[2]
-        move_base_goal.target_pose.pose.orientation.w = quat[3]
-        self.move_base_client.send_goal(move_base_goal)
-        print("Publishing new goal")
-        result = self.move_base_client.wait_for_result()
-        while result == False:
-            print("waypoint false, generate new point")
-            x,y = random_point_on_circle(x,y,1)
-            x,y = bound_adj(x,y)
+        def send_goal(x, y, yaw):
+            move_base_goal = MoveBaseGoal()
+            move_base_goal.target_pose.header.frame_id = "map"
+            move_base_goal.target_pose.header.stamp = rospy.Time.now()
             move_base_goal.target_pose.pose.position.x = x
             move_base_goal.target_pose.pose.position.y = y
+            quat = quaternion_from_euler(0, 0, yaw)
+            move_base_goal.target_pose.pose.orientation.x = quat[0]
+            move_base_goal.target_pose.pose.orientation.y = quat[1]
+            move_base_goal.target_pose.pose.orientation.z = quat[2]
+            move_base_goal.target_pose.pose.orientation.w = quat[3]
             self.move_base_client.send_goal(move_base_goal)
-            result = self.move_base_client.wait_for_result()
+            return move_base_goal
 
-        print(f"Goal finished: {result}")
-        return result
+        goal = send_goal(x, y, yaw)
+        self.move_base_client.wait_for_result()
+        status = self.move_base_client.get_state()
 
+        attempt = 0
+        max_attempts = 10
+
+        while status != GoalStatus.SUCCEEDED and attempt < max_attempts:
+            print(f"[Attempt {attempt+1}] Failed to reach ({x:.2f}, {y:.2f}), retrying...")
+            x, y = random_point_on_circle(x, y, 1.0)
+            x, y = bound_adj(x, y)
+            goal = send_goal(x, y, yaw)
+            self.move_base_client.wait_for_result()
+            status = self.move_base_client.get_state()
+            attempt += 1
+
+        if status == GoalStatus.SUCCEEDED:
+            print(f"Goal reached at ({x:.2f}, {y:.2f})")
+        else:
+            print(f"Failed to reach goal after {max_attempts} attempts")
+
+        return status == GoalStatus.SUCCEEDED
 
 if __name__ == "__main__":
     rospy.init_node("scheduler", anonymous=True)
     scheduler = Scheduler()
     scheduler.schedule()
-    scheduler.exp_sch()
+    # scheduler.exp_sch()
+    scheduler.sample_sch()
