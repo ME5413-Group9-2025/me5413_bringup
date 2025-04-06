@@ -37,7 +37,7 @@ class ZigZagSampler:
         y_max = -3 - col * block_width
         y_min = y_max - block_width
 
-        x_min = 8.5 + row * block_height
+        x_min = 9.5 + row * block_height
         x_max = x_min + block_height
 
         return (x_min, x_max, y_min, y_max)
