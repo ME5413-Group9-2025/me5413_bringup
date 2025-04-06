@@ -67,14 +67,18 @@ class Scheduler:
                     break
         self.enable_perception_client.call(True)
         rospy.logfatal("Start ZigZag exploration")
-        cols, rows = 8, 2
+        sample_point = []
+        cols, rows = 8, 3
         exploration_order = self.sampler.generate_order(cols=cols, rows=rows)
         for block_num in exploration_order:
+            if self.sampler.block_not_skip == Falese:
+                continue
             x, y = self.sampler.process_single_block(block_num, cols, rows)
             if not x or not y:
                 continue
             yaw = math.pi if block_num > cols else 0
             result = self.publish_navigation_goal(x, y, yaw)
+            sample_point.append[(x,y)]
             rospy.sleep(1.0)
         self.enable_perception_client.call(False)
         rospy.loginfo("exiting schedule")

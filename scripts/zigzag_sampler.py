@@ -77,10 +77,12 @@ class ZigZagSampler:
         i = cols
         j = 0
         while i:
-            i = i - 1
-            res.append(rows * cols - j)
-            res.append((rows - 1) * cols - j)
-            j = j + 1
+            i = i-1
+            if i%2 == 0:
+                res.append(cols - j)
+            else:
+                res.append(rows * cols - j)
+            j = j+1
         # i = cols
         # j = 1
         # while i:
@@ -89,6 +91,31 @@ class ZigZagSampler:
         #     res.append(j)
         #     j = j + 1
         return res
+
+    def block_not_skip(self, block_num, cols, rows):
+        if self.map_data is None:
+            rospy.logwarn("Map data not available")
+            return False
+
+        x_min, x_max, y_min, y_max = self.get_block_bounds(block_num, cols, rows)
+        
+        mx_start = math.floor((x_min - self.map_origin_x) / self.map_resolution)
+        mx_end = math.ceil((x_max - self.map_origin_x) / self.map_resolution)
+        my_start = math.floor((y_min - self.map_origin_y) / self.map_resolution)
+        my_end = math.ceil((y_max - self.map_origin_y) / self.map_resolution)
+        
+        mx_start = max(0, int(mx_start))
+        mx_end = min(self.map_width, int(mx_end))
+        my_start = max(0, int(my_start))
+        my_end = min(self.map_height, int(my_end))
+    
+        for mx in range(mx_start, mx_end):
+            for my in range(my_start, my_end):
+                if 0 <= mx < self.map_width and 0 <= my < self.map_height:
+                    index = my * self.map_width + mx
+                    if self.map_data.data[index] > 50:
+                        return True
+        return False
 
     def process_all_blocks(self, cols, rows):
         result = []
