@@ -26,5 +26,5 @@
   </node>
 
   <node name="bridge_detector" pkg="me5413_perception" type="bridge_detector_node.py" />
-
+  <node name="digit_recognizer" pkg="me5413_perception" type="digit_recognizer_node.py" />
 </launch>

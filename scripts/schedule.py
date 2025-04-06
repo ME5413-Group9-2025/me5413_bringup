@@ -1,16 +1,22 @@
 import numpy as np
 import math
-import random
 
 from actionlib import SimpleActionClient, GoalStatus
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from geometry_msgs.msg import PoseStamped, Twist, TransformStamped
-from std_msgs.msg import Bool
+from std_msgs.msg import Bool, Int32MultiArray
 import rospy
 from std_srvs.srv import SetBool, Empty
 from tf.transformations import quaternion_from_euler
 from me5413_bringup.srv import SingleDigit
 from tf2_ros import Buffer, TransformListener
+
+import sys
+from pathlib import Path
+
+package_path = str(Path(__file__).parent.absolute())
+sys.path.append(package_path)
+from zigzag_sampler import ZigZagSampler
 
 bridge_length = 5
 
@@ -18,6 +24,7 @@ bridge_length = 5
 class Scheduler:
     def __init__(self):
         # Global Variable
+        self.digit_count = None
         self.exploration_process = None
         self.sample_radius = 1
 
@@ -31,27 +38,24 @@ class Scheduler:
         self.exploration_bound = rospy.get_param("~exploration_bound", None)
         self.target_waypoints = rospy.get_param("~target_waypoints", None)
 
+        # Sampler
+        self.sampler = ZigZagSampler()
+
+        # ROS communication
         self.move_base_client = SimpleActionClient("move_base", MoveBaseAction)
         self.bridge_open_pub = rospy.Publisher("/cmd_open_bridge", Bool, queue_size=10)
         self.bridge_position_sub = rospy.Subscriber("/bridge_pose", PoseStamped, self.bridge_pose_callback)
         self.enable_perception_client = rospy.ServiceProxy("/enable_perception_signal", SetBool)
         self.enable_bridge_client = rospy.ServiceProxy("/enable_bridge_signal", SetBool)
         self.clear_costmap_client = rospy.ServiceProxy("/move_base/clear_costmaps", Empty)
-        self.recognize_digit_client = rospy.ServiceProxy("/recognize_digit", SingleDigit)
+        self.recognize_digit_client = rospy.ServiceProxy("/recognize_target", SingleDigit)
         self.cmd_vel_pub = rospy.Publisher("/cmd_vel", Twist, queue_size=10)
+        self.digit_count_sub = rospy.Subscriber("/digit_count", Int32MultiArray, self.digit_count_callback)
         self.move_base_client.wait_for_server()
         print("Scheduler initialized")
 
-    def bound(self, x, y):
-        x_min, x_max = self.exploration_bound["x_min"], self.exploration_bound["x_max"]
-        y_min, y_max = self.exploration_bound["y_min"], self.exploration_bound["y_max"]
-        return np.clip(x, x_min, x_max), np.clip(y, y_min, y_max)
-
-    def sample_exploration_waypoint(self, x, y):
-        angle = random.uniform(0, 2 * math.pi)
-        random_x = x + self.sample_radius * math.cos(angle)
-        random_y = y + self.sample_radius * math.sin(angle)
-        return random_x, random_y
+    def digit_count_callback(self, data):
+        self.digit_count = data.data
 
     def schedule(self):
         rospy.loginfo("Start Navigation")
@@ -61,18 +65,18 @@ class Scheduler:
                 rospy.sleep(1.0)
                 if result:
                     break
-
-        # rospy.loginfo("Start Exploration")
-        # for x, y, yaw in self.exploration_waypoints:
-        #     while True:
-        #         result = self.publish_navigation_goal(x, y, yaw)
-        #         if not result:
-        #             rospy.logwarn("waypoint false, generate new point")
-        #             x, y = self.sample_exploration_waypoint(x, y)
-        #             x, y = self.bound(x, y)
-        #         rospy.sleep(1.)
-        # self.enable_bridge_client.call(True)
-
+        self.enable_perception_client.call(True)
+        rospy.logfatal("Start ZigZag exploration")
+        cols, rows = 8, 2
+        exploration_order = self.sampler.generate_order(cols=cols, rows=rows)
+        for block_num in exploration_order:
+            x, y = self.sampler.process_single_block(block_num, cols, rows)
+            if not x or not y:
+                continue
+            yaw = math.pi if block_num > cols else 0
+            result = self.publish_navigation_goal(x, y, yaw)
+            rospy.sleep(1.0)
+        self.enable_perception_client.call(False)
         rospy.loginfo("exiting schedule")
 
     def get_target_waypoints_sequence(self):
@@ -103,13 +107,16 @@ class Scheduler:
             self.cmd_vel_pub.publish(cmd_vel)
             rospy.sleep(0.1)
         # Planning the waypoints
+        target = np.argmax(self.digit_count)
+        rospy.logfatal(f"Target digit is {target}")
         waypoints = self.get_target_waypoints_sequence()
         for waypoint in waypoints:
             x, y = waypoint
             self.publish_navigation_goal(x, y, math.pi)
-            # response = self.recognize_digit_client.call()
-            # digit = response.digit
-            # TODO: Decide if it is the target
+            response = self.recognize_digit_client.call()
+            if response.digit == target:
+                rospy.logfatal("Found the target, exiting!")
+                break
             rospy.sleep(1.0)
 
     def publish_navigation_goal(self, x, y, yaw, timeout=20):
