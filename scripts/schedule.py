@@ -110,17 +110,17 @@ class Scheduler:
             self.cmd_vel_pub.publish(cmd_vel)
             rospy.sleep(0.1)
         # Planning the waypoints
-        target = np.argmax(self.digit_count)
-        rospy.logfatal(f"Target digit is {target}")
         waypoints = self.get_target_waypoints_sequence()
+        times = []
         for waypoint in waypoints:
             x, y = waypoint
             self.publish_navigation_goal(x, y, math.pi)
             response = self.recognize_digit_client.call()
-            if response.digit == target:
-                rospy.logfatal("Found the target, exiting!")
-                break
+            times.append(self.digit_count[response.digit])
             rospy.sleep(1.0)
+        goal = waypoints[np.argmin(times)]
+        self.publish_navigation_goal(goal[0], goal[1], math.pi)
+        rospy.logfatal("Found the target, exiting!")
 
     def publish_navigation_goal(self, x, y, yaw, timeout=20):
         move_base_goal = MoveBaseGoal()
