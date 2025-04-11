@@ -18,7 +18,7 @@ package_path = str(Path(__file__).parent.absolute())
 sys.path.append(package_path)
 from zigzag_sampler import ZigZagSampler
 
-bridge_length = 5
+bridge_length = 6
 
 
 class Scheduler:
@@ -55,7 +55,7 @@ class Scheduler:
         rospy.loginfo("Scheduler initialized")
 
     def digit_count_callback(self, data):
-        self.digit_count = data.data
+        self.digit_count = np.array(data.data)
 
     def schedule(self):
         rospy.loginfo("Start Navigation")
@@ -76,8 +76,11 @@ class Scheduler:
             if not x or not y:
                 continue
             yaw = math.pi if block_num > cols else 0
-            result = self.publish_navigation_goal(x, y, yaw)
-            rospy.sleep(1.0)
+            while True:
+                result = self.publish_navigation_goal(x, y, yaw)
+                rospy.sleep(1.0)
+                if result:
+                    break
         self.enable_perception_client.call(False)
         self.enable_bridge_client.call(True)
         rospy.loginfo("exiting schedule")
@@ -109,18 +112,21 @@ class Scheduler:
             cmd_vel.linear.x = 1.5
             self.cmd_vel_pub.publish(cmd_vel)
             rospy.sleep(0.1)
+        self.clear_costmap_client.call()
+        rospy.sleep(1.0)
         # Planning the waypoints
+        self.digit_count[self.digit_count == 0] = 1e9
+        target = np.argmin(self.digit_count)
+        rospy.logfatal(f"Target digit is {target}")
         waypoints = self.get_target_waypoints_sequence()
-        times = []
         for waypoint in waypoints:
             x, y = waypoint
             self.publish_navigation_goal(x, y, math.pi)
             response = self.recognize_digit_client.call()
-            times.append(self.digit_count[response.digit])
+            if response.digit == target:
+                rospy.logfatal("Found the target, exiting!")
+                break
             rospy.sleep(1.0)
-        goal = waypoints[np.argmin(times)]
-        self.publish_navigation_goal(goal[0], goal[1], math.pi)
-        rospy.logfatal("Found the target, exiting!")
 
     def publish_navigation_goal(self, x, y, yaw, timeout=20):
         move_base_goal = MoveBaseGoal()
