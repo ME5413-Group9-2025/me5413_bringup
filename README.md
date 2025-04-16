@@ -62,30 +62,24 @@ After forking this repo to your own github:
 
 ```bash
 # Clone your own fork of this repo (assuming home here `~/`)
-cd
-https://github.com/ME5413-Group9-2025/ME5413_Final_Project.git
+git clone --recurse-submodules https://github.com/ME5413-Group9-2025/ME5413_Final_Project.git
 cd ME5413_Final_Project
-rm -rf .git # After this step, any updates from TA will conduct by yourself manually
 
-# Clone the necessary repository
-cd src
-git clone https://github.com/ME5413-Group9-2025/navigation
-git clone https://github.com/ME5413-Group9-2025/robot_localization.git --branch noetic-devel
-git clone https://github.com/ME5413-Group9-2025/teb_local_planner.git
-git clone https://github.com/ME5413-Group9-2025/explore_lite.git
-git clone https://github.com/ME5413-Group9-2025/me5413_bringup.git
-git clone https://github.com/ME5413-Group9-2025/me5413_perception.git
-
-# clone any other code in our github team and cartographer
+# Install python packages
+pip install opencv-python
+pip install torch==2.2.0 torchvision==0.17.0 torchaudio==2.2.0 --index-url https://download.pytorch.org/whl/cu121
+pip install transformers==4.46.3
 
 # Install all dependencies
-cd ..
+rosdep update
 rosdep install --from-paths src --ignore-src -r -y
+sudo apt-get remove ros-noetic-abseil-cpp
+sh src/cartographer/scripts/install_abseil.sh
 
 # Build
-rm -rf build build_isolated install install_isolated devel devel_isolated
-catkin_make_isolated
-# only make specified package
+catkin_make_isolated --use-ninja
+
+# Build specified package
 catkin_make_isolated --pkg <pkg_name> --use-ninja
 
 # Source 
@@ -131,37 +125,14 @@ sh start.sh
 
 Here, manual teleoperation is automatically load, default input is Xbox joystick .
 
-### 1. Mapping
+### 1. Bringup all
 
 After launching **Step 0**, in the second terminal:
 
 ```bash
-# Launch GMapping, No only support GMapping, Google Catographer on the way
 roslaunch me5413_bringup bringup.launch slam_method:=cartographer
 ```
-
-After finishing mapping, run the following command in the thrid terminal to save the map:
-
-```bash
-# Save the map as `my_map` in the `maps/` folder
-roscd me5413_bringup/maps/
-rosrun map_server map_saver -f my_map map:=/map
-```
-
-![rviz_nmapping_image](media/rviz_mapping.png)
-
-### 2. Navigation
-
-Once completed **Step 1** mapping and saved your map, quit the mapping process.
-
-Then, in the second terminal:
-
-```bash
-# Load a map, launch AMCL localizer, start navigation
-roslaunch me5413_bringup bringup.launch slam_method:=cartographer
-```
-
-![rviz_navigation_image](media/rviz_navigation.png)
+This command will bringup the whole pipeline, including cartographer, navigation, schedule and perception.
 
 ## Student Tasks
 
